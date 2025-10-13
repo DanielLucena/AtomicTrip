@@ -21,6 +21,9 @@ class UDPClient {
 				if ("quit".equalsIgnoreCase(message)) {
 					break;
 				}
+				if ("test".equalsIgnoreCase(message)){
+					message = "POST;/trips;{\"origem\":{\"cidade\":\"São Paulo\",\"estado\":\"SP\",\"pais\":\"Brasil\"},\"destino\":{\"cidade\":\"Rio de Janeiro\",\"estado\":\"RJ\",\"pais\":\"Brasil\"},\"dataIda\":\"2023-12-20T10:00:00Z\",\"dataVolta\":\"2023-12-27T18:00:00Z\"}";
+				}
 				sendMessage = message.getBytes();
 				DatagramPacket sendPacket = new DatagramPacket(
 						sendMessage, sendMessage.length,

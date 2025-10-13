@@ -1,20 +1,20 @@
-package dev.danielrl.atomictrip.server;
+package dev.danielrl.flights.server;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.StringTokenizer;
 
-import dev.danielrl.atomictrip.dto.Message;
-import dev.danielrl.atomictrip.dto.TripDetailsDTO;
-import dev.danielrl.atomictrip.service.TripService;
+import dev.danielrl.flights.dto.Message;
+import dev.danielrl.flights.model.Flight;
+import dev.danielrl.flights.service.FlightService;
 
 public class UdpServer implements Server {
 
-	private TripService tripService;
+    private FlightService flightService;
 	//ExecutorService poolvthreads = Executors.newVirtualThreadPerTaskExecutor();
 	public void start(int port) {
-		tripService = new TripService();
+		this.flightService = new FlightService();
 		System.out.println("Starting UDP server...");
 		try {
 			DatagramSocket serverSocket = new DatagramSocket(port);
@@ -35,7 +35,7 @@ public class UdpServer implements Server {
 		} catch (Exception e) {
 			System.out.println("Erro inesperado: " + e.getMessage());
 		}
-		System.out.println("UDP Bank server terminating");
+		System.out.println("UDP Flights server terminating");
 	}
 
 
@@ -54,14 +54,9 @@ public class UdpServer implements Server {
 			}
 			Message msgObj = new Message(verb, path, body);
 
-			TripDetailsDTO tripDetails = new TripDetailsDTO(body);
-			if (tripDetails.isEmpty()) {
-				return;
-			}
-
 			switch (path) {
-				case "trip":
-					tripService.bookTrip(tripDetails);
+				case "bookFlight":
+					flightService.bookFlight(body);
 					break;
 			}
 			System.out.println(
