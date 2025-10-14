@@ -9,7 +9,7 @@ public class Main {
         // String protocol = System.getenv("PROTOCOL");
         // int port = Integer.parseInt(System.getenv("PORT"));
         Server server = ServerFactory.ServerFactory("udp");
-        server.start(8009);
+        server.start("8009");
 
     }
 }

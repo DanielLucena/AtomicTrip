@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.Scanner;
 
 class UDPClient {
@@ -13,8 +14,13 @@ class UDPClient {
 		Scanner scanner = new Scanner(System.in);
 		try {
 			DatagramSocket clientSocket = new DatagramSocket();
+			DatagramPacket sendPacket;
 			InetAddress inetAddress = InetAddress.getByName("localhost");
+
 			byte[] sendMessage;
+			byte[] receivemessage = new byte[1024];
+
+
 			while (true) {
 				System.out.print("Enter a message: ");
 				String message = scanner.nextLine();
@@ -22,14 +28,27 @@ class UDPClient {
 					break;
 				}
 				if ("test".equalsIgnoreCase(message)){
-					message = "POST;/trips;{\"origem\":{\"cidade\":\"São Paulo\",\"estado\":\"SP\",\"pais\":\"Brasil\"},\"destino\":{\"cidade\":\"Rio de Janeiro\",\"estado\":\"RJ\",\"pais\":\"Brasil\"},\"dataIda\":\"2023-12-20T10:00:00Z\",\"dataVolta\":\"2023-12-27T18:00:00Z\"}";
+					message = "book;NYC;LA;2024-12-20;2025-01-05";
+				}
+				if ("bank".equalsIgnoreCase(message)){
+					message = "criar;1234;0";
 				}
 				sendMessage = message.getBytes();
-				DatagramPacket sendPacket = new DatagramPacket(
+
+				System.out.println("Sending message: " + message + " to " + inetAddress + ":8009");
+				sendPacket = new DatagramPacket(
 						sendMessage, sendMessage.length,
 						inetAddress, 8009);
+				// informativo		
 				System.out.println("pacotes: " + (int) Math.ceil((double) sendMessage.length / 1024));
+
 				clientSocket.send(sendPacket);
+
+				//Receber resposta do Servidor - Conta Aberta
+				DatagramPacket receivepacket = new DatagramPacket(receivemessage, receivemessage.length);
+				clientSocket.receive(receivepacket);
+				message = new String(receivepacket.getData());
+				System.out.println(message);
 			}
 			clientSocket.close();
 		} catch (IOException ex) {

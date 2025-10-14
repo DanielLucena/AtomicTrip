@@ -1,6 +1,6 @@
 package dev.danielrl.atomictrip.model;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 
@@ -8,15 +8,17 @@ public class Trip {
     private UUID id;
     private Location destino;
     private Location origem;
-    private Date dataIda;
-    private Date dataVolta;
+    private ZonedDateTime dataIda;
+    private ZonedDateTime dataVolta;
+    private boolean isConfirmed;
 
-    public Trip(Location origem, Location destino, Date dataVolta, Date dataIda) {
+    public Trip(Location origem, Location destino, ZonedDateTime dataVolta, ZonedDateTime dataIda) {
         this.id = UUID.randomUUID();
         this.destino = destino;
         this.origem = origem;
         this.dataIda = dataIda;
         this.dataVolta = dataVolta;
+        this.isConfirmed = false;
     }
 
     public UUID getId() {
@@ -31,11 +33,36 @@ public class Trip {
         return origem;
     }
 
-    public Date getDataIda() {
+    public ZonedDateTime getDataIda() {
         return dataIda;
     }
 
-    public Date getDataVolta() {
+    public ZonedDateTime getDataVolta() {
         return dataVolta;
     }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public boolean isConfirmed() {
+        return isConfirmed;
+    }
+
+    public void confirmTrip() {
+        this.isConfirmed = true;
+    }
+
+    @Override
+    public String toString() {
+        return "Trip{" +
+                "id=" + id +
+                ", destino=" + destino +
+                ", origem=" + origem +
+                ", dataIda=" + dataIda +
+                ", dataVolta=" + dataVolta +
+                ", isConfirmed=" + isConfirmed +
+                '}';
+    }  
+
 }

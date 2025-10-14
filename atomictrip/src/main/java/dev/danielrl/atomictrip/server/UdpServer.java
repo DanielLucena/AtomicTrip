@@ -13,19 +13,23 @@ public class UdpServer implements Server {
 
 	private TripService tripService;
 	//ExecutorService poolvthreads = Executors.newVirtualThreadPerTaskExecutor();
-	public void start(int port) {
+
+	@Override
+	public void start(String port) {
 		tripService = new TripService();
-		System.out.println("Starting UDP server...");
+		System.out.println("UDP Server Bank started");
 		try {
-			DatagramSocket serverSocket = new DatagramSocket(port);
+			DatagramSocket serversocket = new DatagramSocket(Integer.parseInt(port));
 			while (true) {
-				byte[] receiveMessage = new byte[1024];
-				DatagramPacket receivePacket = new DatagramPacket(receiveMessage, receiveMessage.length);
-				serverSocket.receive(receivePacket);
-				String message = new String(receivePacket.getData(), 0, receivePacket.getLength());
+				byte[] receivemessage = new byte[1024];
+				DatagramPacket receivepacket = new DatagramPacket(receivemessage, receivemessage.length);
+				serversocket.receive(receivepacket);
+				System.out.println("PACOTE RECEBIDO");
+				String message = new String(receivepacket.getData(), 0, receivepacket.getLength());
 				//poolvthreads.submit(() -> {
-					processarMensagem(message, receivePacket, serverSocket);
+					processarMensagem(message, receivepacket, serversocket);
 				//});
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -39,38 +43,36 @@ public class UdpServer implements Server {
 	}
 
 
-	private void processarMensagem(String message, DatagramPacket receivePacket, DatagramSocket serverSocket) {
-		System.out.println("Received message: " + message);
-		String verb = null;
-		String path = null;
-		String body = null;
+	private void processarMensagem(String message, DatagramPacket receivepacket, DatagramSocket serversocket) {
+		String operacao = null;
+		int conta = 0;
+		int valor = 0;
 		String resultadoOp = message;
 		try {
 			StringTokenizer tokenizer = new StringTokenizer(message, ";");
 			while (tokenizer.hasMoreElements()) {
-				verb = tokenizer.nextToken();
-				path = tokenizer.nextToken();
-				body = tokenizer.nextToken().trim();
+				operacao = tokenizer.nextToken();
+				conta = Integer.parseInt(tokenizer.nextToken());
+				valor = Integer.parseInt(tokenizer.nextToken().trim());
 			}
-			Message msgObj = new Message(verb, path, body);
-
-			TripDetailsDTO tripDetails = new TripDetailsDTO(body);
-			if (tripDetails.isEmpty()) {
-				return;
-			}
-
-			switch (path) {
-				case "trip":
-					tripService.bookTrip(tripDetails);
-					break;
-			}
+			// switch (operacao) {
+			// 	case "criar":
+			// 		banco.addConta(conta);
+			// 		break;
+			// 	case "depositar":
+			// 		banco.depositar(conta, valor);
+			// 		break;
+			// 	case "saldo":
+			// 		resultadoOp = "R$" + banco.saldo(conta);
+			// 		break;
+			// }
 			System.out.println(
-					"Operacao realizada:" + path + "-" + msgObj.getBody() + "-" + receivePacket.getAddress());
+					"Operacao realizada:" + operacao + " - conta: " + conta + " - valor: " + valor + " - " + receivepacket.getAddress());
 			String reply = "Confirmo Recebimento de:" + resultadoOp;
 			byte[] replymsg = reply.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(replymsg, replymsg.length,
-					receivePacket.getAddress(), receivePacket.getPort());
-			serverSocket.send(sendPacket);
+					receivepacket.getAddress(), receivepacket.getPort());
+			serversocket.send(sendPacket);
 		} catch (IOException e) {
 				e.printStackTrace();
 		} catch (NumberFormatException nfe) {
