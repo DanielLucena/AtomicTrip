@@ -3,10 +3,12 @@ package dev.danielrl.atomictrip.server;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.time.ZonedDateTime;
 import java.util.StringTokenizer;
 
 import dev.danielrl.atomictrip.dto.Message;
 import dev.danielrl.atomictrip.dto.TripDetailsDTO;
+import dev.danielrl.atomictrip.model.Location;
 import dev.danielrl.atomictrip.service.TripService;
 
 public class UdpServer implements Server {
@@ -45,29 +47,35 @@ public class UdpServer implements Server {
 
 	private void processarMensagem(String message, DatagramPacket receivepacket, DatagramSocket serversocket) {
 		String operacao = null;
-		int conta = 0;
-		int valor = 0;
+		String dataIda = null;
+		String dataVolta = null;
+		String origem = null;
+		String destino = null;
 		String resultadoOp = message;
 		try {
 			StringTokenizer tokenizer = new StringTokenizer(message, ";");
 			while (tokenizer.hasMoreElements()) {
 				operacao = tokenizer.nextToken();
-				conta = Integer.parseInt(tokenizer.nextToken());
-				valor = Integer.parseInt(tokenizer.nextToken().trim());
+				dataIda = tokenizer.nextToken();
+				dataVolta = tokenizer.nextToken();
+				origem = tokenizer.nextToken();
+				destino = tokenizer.nextToken().trim();
 			}
-			// switch (operacao) {
-			// 	case "criar":
-			// 		banco.addConta(conta);
-			// 		break;
-			// 	case "depositar":
-			// 		banco.depositar(conta, valor);
-			// 		break;
-			// 	case "saldo":
-			// 		resultadoOp = "R$" + banco.saldo(conta);
-			// 		break;
-			// }
+			switch (operacao) {
+				case "bookflight":
+					resultadoOp = new TripDetailsDTO( Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta)).toString();
+					break;
+				case "bookhotel":
+					resultadoOp = new TripDetailsDTO( Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta)).toString();
+					break;
+				case "booktrip":
+					resultadoOp = new TripDetailsDTO( Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta)).toString();
+					break;
+				default:
+					resultadoOp = "Operacao Invalida";
+			}
 			System.out.println(
-					"Operacao realizada:" + operacao + " - conta: " + conta + " - valor: " + valor + " - " + receivepacket.getAddress());
+					"Operacao realizada:" + operacao + " - dataIda: " + dataIda + " - dataVolta: " + dataVolta + " - origem: " + origem + " - destino: " + " - " + receivepacket.getAddress());
 			String reply = "Confirmo Recebimento de:" + resultadoOp;
 			byte[] replymsg = reply.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(replymsg, replymsg.length,
