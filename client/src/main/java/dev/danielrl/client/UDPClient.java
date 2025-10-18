@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.Scanner;
 
 class UDPClient {
@@ -33,12 +32,21 @@ class UDPClient {
 				if ("bank".equalsIgnoreCase(message)){
 					message = "criar;1234;0";
 				}
+				if ("reserve".equalsIgnoreCase(message)){
+					message = "reserveflight;2025-10-12;NATAL;RECIFE";
+				}
+				if("confirm".equalsIgnoreCase(message)){
+					message = "confirmflight;2025-10-12;NATAL;RECIFE";
+				}
+				if("cancel".equalsIgnoreCase(message)){
+					message = "cancelflight;2025-10-12;NATAL;RECIFE";
+				}
 				sendMessage = message.getBytes();
 
 				System.out.println("Sending message: " + message + " to " + inetAddress + ":8009");
 				sendPacket = new DatagramPacket(
 						sendMessage, sendMessage.length,
-						inetAddress, 8009);
+						inetAddress, 8010);
 				// informativo		
 				System.out.println("pacotes: " + (int) Math.ceil((double) sendMessage.length / 1024));
 

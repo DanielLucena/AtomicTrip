@@ -3,29 +3,35 @@ package dev.danielrl.flights.server;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.time.ZonedDateTime;
 import java.util.StringTokenizer;
 
-import dev.danielrl.flights.dto.Message;
+import dev.danielrl.flights.dto.FlightResponse;
 import dev.danielrl.flights.model.Flight;
+import dev.danielrl.flights.model.Location;
 import dev.danielrl.flights.service.FlightService;
 
 public class UdpServer implements Server {
 
-    private FlightService flightService;
-	//ExecutorService poolvthreads = Executors.newVirtualThreadPerTaskExecutor();
-	public void start(int port) {
-		this.flightService = new FlightService();
-		System.out.println("Starting UDP server...");
+	private FlightService flightService;
+	// ExecutorService poolvthreads = Executors.newVirtualThreadPerTaskExecutor();
+
+	@Override
+	public void start(String port) {
+		flightService = new FlightService();
+		System.out.println("UDP Server Flight started");
 		try {
-			DatagramSocket serverSocket = new DatagramSocket(port);
+			DatagramSocket serversocket = new DatagramSocket(Integer.parseInt(port));
 			while (true) {
-				byte[] receiveMessage = new byte[1024];
-				DatagramPacket receivePacket = new DatagramPacket(receiveMessage, receiveMessage.length);
-				serverSocket.receive(receivePacket);
-				String message = new String(receivePacket.getData(), 0, receivePacket.getLength());
-				//poolvthreads.submit(() -> {
-					processarMensagem(message, receivePacket, serverSocket);
-				//});
+				byte[] receivemessage = new byte[1024];
+				DatagramPacket receivepacket = new DatagramPacket(receivemessage, receivemessage.length);
+				serversocket.receive(receivepacket);
+				System.out.println("PACOTE RECEBIDO");
+				String message = new String(receivepacket.getData(), 0, receivepacket.getLength());
+				// poolvthreads.submit(() -> {
+				processarMensagem(message, receivepacket, serversocket);
+				// });
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -35,39 +41,49 @@ public class UdpServer implements Server {
 		} catch (Exception e) {
 			System.out.println("Erro inesperado: " + e.getMessage());
 		}
-		System.out.println("UDP Flights server terminating");
+		System.out.println("UDP Flight server terminating");
 	}
 
-
-	private void processarMensagem(String message, DatagramPacket receivePacket, DatagramSocket serverSocket) {
-		System.out.println("Received message: " + message);
-		String verb = null;
-		String path = null;
-		String body = null;
-		String resultadoOp = message;
+	private void processarMensagem(String message, DatagramPacket receivepacket, DatagramSocket serversocket) {
+		String operacao = null;
+		String data = null;
+		String origem = null;
+		String destino = null;
+		FlightResponse flightResponse = FlightResponse.NO_RESULTS;
 		try {
 			StringTokenizer tokenizer = new StringTokenizer(message, ";");
 			while (tokenizer.hasMoreElements()) {
-				verb = tokenizer.nextToken();
-				path = tokenizer.nextToken();
-				body = tokenizer.nextToken().trim();
-			}
-			Message msgObj = new Message(verb, path, body);
+				operacao = tokenizer.nextToken();
+				data = tokenizer.nextToken();
+				origem = tokenizer.nextToken();
+				destino = tokenizer.nextToken().trim();
 
-			switch (path) {
-				case "bookFlight":
-					flightService.bookFlight(body);
-					break;
+				Flight flight = new Flight(Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(data+"T00:00:00Z"));
+
+				switch (operacao) {
+					case "reserveflight":
+						flightResponse = flightService.reserveFlight(flight);
+						break;
+					case "confirmflight":
+						flightResponse = flightService.confirmFlight(flight);
+						break;
+					case "cancelflight":
+						flightResponse = flightService.cancelFlight(flight);
+						break;
+					default:
+						flightResponse = FlightResponse.FAILURE;
+				}
 			}
+
 			System.out.println(
-					"Operacao realizada:" + path + "-" + msgObj.getBody() + "-" + receivePacket.getAddress());
-			String reply = "Confirmo Recebimento de:" + resultadoOp;
+					"Operacao realizada:" + operacao + " - Data: " + data + " - Origem: " + origem + " - Destino: " + destino + " - " + receivepacket.getAddress());
+			String reply = flightResponse.name();
 			byte[] replymsg = reply.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(replymsg, replymsg.length,
-					receivePacket.getAddress(), receivePacket.getPort());
-			serverSocket.send(sendPacket);
+					receivepacket.getAddress(), receivepacket.getPort());
+			serversocket.send(sendPacket);
 		} catch (IOException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		} catch (NumberFormatException nfe) {
 			System.out.println("Erro ao converter numero: " + nfe.getMessage());
 		}

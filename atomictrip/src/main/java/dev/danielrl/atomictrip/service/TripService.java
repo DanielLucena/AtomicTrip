@@ -16,7 +16,19 @@ public class TripService {
         // Lógica para reservar uma viagem
         System.out.println("Booking trip with details: " + tripDetails);
         Trip trip = new Trip(tripDetails.getOrigem(), tripDetails.getDestino(), tripDetails.getDataVolta(), tripDetails.getDataIda());
-        TripRepository tripRepository = new TripRepository();
+        saveTrip(trip);
+        String flightcheck = checkFlight(tripDetails);
+
+        
+    }
+
+    public void saveTrip(Trip trip) {
         tripRepository.save(trip);
+    }
+    public String checkFlight(TripDetailsDTO tripDetails) {
+        // Lógica para verificar disponibilidade de voo
+        System.out.println("Checking flight availability for: " + tripDetails);
+        // Simulação de verificação de disponibilidade
+        return "Flight available from " + tripDetails.getOrigem() + " to " + tripDetails.getDestino() + " on " + tripDetails.getDataIda();
     }
 }

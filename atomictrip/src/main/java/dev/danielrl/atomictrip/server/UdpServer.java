@@ -75,7 +75,7 @@ public class UdpServer implements Server {
 					resultadoOp = "Operacao Invalida";
 			}
 			System.out.println(
-					"Operacao realizada:" + operacao + " - dataIda: " + dataIda + " - dataVolta: " + dataVolta + " - origem: " + origem + " - destino: " + " - " + receivepacket.getAddress());
+					"Operacao realizada:" + operacao + " - dataIda: " + dataIda + " - dataVolta: " + dataVolta + " - origem: " + origem + " - destino: " + destino + " - " + receivepacket.getAddress());
 			String reply = "Confirmo Recebimento de:" + resultadoOp;
 			byte[] replymsg = reply.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(replymsg, replymsg.length,
