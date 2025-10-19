@@ -28,6 +28,14 @@ public class FlightReservation {
         return this.reservedSeats;
     }
 
+    public boolean reserveSeat() {
+        if (this.reservedSeats + this.confirmedSeats >= MAX_SEATS) {
+            return false;
+        }
+        this.reservedSeats += 1;
+        return true;
+    }
+
     public boolean confirmSeat() {
         if (this.reservedSeats > 0) {
             this.reservedSeats -= 1;
@@ -35,14 +43,6 @@ public class FlightReservation {
             return true;
         }
         return false;
-    }
-
-    public boolean reserveSeat() {
-        if (this.reservedSeats + this.confirmedSeats >= MAX_SEATS) {
-            return false;
-        }
-        this.reservedSeats += 1;
-        return true;
     }
 
     public boolean cancelReservedSeat() {

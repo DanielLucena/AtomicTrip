@@ -1,6 +1,6 @@
 package dev.danielrl.flights.dto;
 
-public enum FlightResponse {
+public enum ServiceResponse {
     SUCCESS,
     FAILURE,
     NO_RESULTS

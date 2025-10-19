@@ -1,4 +1,4 @@
-package dev.danielrl.flights.server;
+package dev.danielrl.hotels.server;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -6,20 +6,20 @@ import java.net.DatagramSocket;
 import java.time.ZonedDateTime;
 import java.util.StringTokenizer;
 
-import dev.danielrl.flights.dto.ServiceResponse;
-import dev.danielrl.flights.model.Flight;
-import dev.danielrl.flights.model.Location;
-import dev.danielrl.flights.service.FlightService;
+import dev.danielrl.hotels.dto.ServiceResponse;
+import dev.danielrl.hotels.model.HotelFullReservation;
+import dev.danielrl.hotels.model.Location;
+import dev.danielrl.hotels.service.HotelService;
 
 public class UdpServer implements Server {
 
-	private FlightService flightService;
+	private HotelService hotelService;
 	// ExecutorService poolvthreads = Executors.newVirtualThreadPerTaskExecutor();
 
 	@Override
 	public void start(String port) {
-		flightService = new FlightService();
-		System.out.println("UDP Server Flight started");
+		hotelService = new HotelService();
+		System.out.println("UDP Server Hotel started");
 		try {
 			DatagramSocket serversocket = new DatagramSocket(Integer.parseInt(port));
 			while (true) {
@@ -46,38 +46,38 @@ public class UdpServer implements Server {
 
 	private void processarMensagem(String message, DatagramPacket receivepacket, DatagramSocket serversocket) {
 		String operacao = null;
-		String data = null;
-		String origem = null;
+		String dataIda = null;
+        String dataVolta = null;
 		String destino = null;
-		ServiceResponse flightResponse = ServiceResponse.NO_RESULTS;
+		ServiceResponse hotelResponse = ServiceResponse.NO_RESULTS;
 		try {
 			StringTokenizer tokenizer = new StringTokenizer(message, ";");
 			while (tokenizer.hasMoreElements()) {
 				operacao = tokenizer.nextToken();
-				data = tokenizer.nextToken();
-				origem = tokenizer.nextToken();
+				dataIda = tokenizer.nextToken();
+				dataVolta = tokenizer.nextToken();
 				destino = tokenizer.nextToken().trim();
 
-				Flight flight = new Flight(Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(data+"T00:00:00Z"));
+				HotelFullReservation hotel = new HotelFullReservation(Location.valueOf(destino), ZonedDateTime.parse(dataIda+"T00:00:00Z"), ZonedDateTime.parse(dataVolta+"T00:00:00Z"));
 
 				switch (operacao) {
-					case "reserveflight":
-						flightResponse = flightService.reserveFlight(flight);
+					case "reservehotel":
+						hotelResponse = hotelService.reserveHotel(hotel);
 						break;
-					case "confirmflight":
-						flightResponse = flightService.confirmFlight(flight);
+					case "confirmhotel":
+						hotelResponse = hotelService.confirmHotel(hotel);
 						break;
-					case "cancelflight":
-						flightResponse = flightService.cancelFlight(flight);
+					case "cancelhotel":
+						hotelResponse = hotelService.cancelHotel(hotel);
 						break;
 					default:
-						flightResponse = ServiceResponse.FAILURE;
+						hotelResponse = ServiceResponse.FAILURE;
 				}
 			}
 
 			System.out.println(
-					"Operacao realizada:" + operacao + " - Data: " + data + " - Origem: " + origem + " - Destino: " + destino + " - " + receivepacket.getAddress());
-			String reply = flightResponse.name();
+					"Operacao realizada:" + operacao + " - Data: " + dataIda + " - Data Volta: " + dataVolta + " - Destino: " + destino + " - " + receivepacket.getAddress());
+			String reply = hotelResponse.name();
 			byte[] replymsg = reply.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(replymsg, replymsg.length,
 					receivepacket.getAddress(), receivepacket.getPort());
