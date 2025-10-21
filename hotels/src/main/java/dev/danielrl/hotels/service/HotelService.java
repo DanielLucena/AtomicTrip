@@ -7,17 +7,17 @@ public class HotelService {
 
     public ServiceResponse reserveHotel(HotelFullReservation hotel) {
         // Lógica para reservar um hotel
-        return ServiceResponse.FAILURE;
+        return ServiceResponse.SUCCESS;
     }
 
     public ServiceResponse confirmHotel(HotelFullReservation hotel) {
         // Lógica para confirmar uma reserva de hotel
-        return ServiceResponse.FAILURE;
+        return ServiceResponse.SUCCESS;
     }
 
     public ServiceResponse cancelHotel(HotelFullReservation hotel) {
         // Lógica para cancelar uma reserva de hotel
-        return ServiceResponse.FAILURE;
+        return ServiceResponse.SUCCESS;
     }
 
 }

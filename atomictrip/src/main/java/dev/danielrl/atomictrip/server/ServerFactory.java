@@ -5,6 +5,8 @@ public class ServerFactory {
         switch (protocol) {
             case "udp":
                 return new UdpServer();
+            case "tcp":
+                return new TcpServer();
             default:
                 throw new IllegalArgumentException(" não é oferecido suporte ao protocolo: " + protocol  ); 
         }

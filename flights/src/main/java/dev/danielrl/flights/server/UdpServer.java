@@ -29,6 +29,7 @@ public class UdpServer implements Server {
 				System.out.println("PACOTE RECEBIDO");
 				String message = new String(receivepacket.getData(), 0, receivepacket.getLength());
 				// poolvthreads.submit(() -> {
+				System.out.println("Mensagem recebida: " + message);
 				processarMensagem(message, receivepacket, serversocket);
 				// });
 

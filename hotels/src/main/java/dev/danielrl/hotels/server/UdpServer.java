@@ -41,7 +41,7 @@ public class UdpServer implements Server {
 		} catch (Exception e) {
 			System.out.println("Erro inesperado: " + e.getMessage());
 		}
-		System.out.println("UDP Flight server terminating");
+		System.out.println("UDP Hotel server terminating");
 	}
 
 	private void processarMensagem(String message, DatagramPacket receivepacket, DatagramSocket serversocket) {

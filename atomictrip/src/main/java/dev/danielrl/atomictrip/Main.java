@@ -8,7 +8,7 @@ public class Main {
         System.out.println("Hello world!");
         // String protocol = System.getenv("PROTOCOL");
         // int port = Integer.parseInt(System.getenv("PORT"));
-        Server server = ServerFactory.ServerFactory("udp");
+        Server server = ServerFactory.ServerFactory("tcp");
         server.start("8009");
 
     }

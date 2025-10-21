@@ -73,7 +73,7 @@ public class UdpServer implements Server {
 					resultadoOp = new TripDetailsDTO( Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta)).toString();
 					break;
 				case "booktrip":
-					resultadoOp = new TripDetailsDTO( Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta)).toString();
+					resultadoOp = tripService.bookTrip(tripDetails);
 					break;
 				default:
 					resultadoOp = "Operacao Invalida";
