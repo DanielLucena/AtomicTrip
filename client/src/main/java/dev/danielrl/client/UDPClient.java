@@ -41,12 +41,15 @@ class UDPClient {
 				if("cancel".equalsIgnoreCase(message)){
 					message = "cancelflight;2025-10-12;NATAL;RECIFE";
 				}
+				if("bookflight".equalsIgnoreCase(message)){
+					message = "bookflight;2025-12-20T00:00:00Z;2025-12-27T00:00:00Z;NATAL;RECIFE;";
+				}
 				sendMessage = message.getBytes();
 
 				System.out.println("Sending message: " + message + " to " + inetAddress + ":8009");
 				sendPacket = new DatagramPacket(
 						sendMessage, sendMessage.length,
-						inetAddress, 8010);
+						inetAddress, 8009);
 				// informativo		
 				System.out.println("pacotes: " + (int) Math.ceil((double) sendMessage.length / 1024));
 

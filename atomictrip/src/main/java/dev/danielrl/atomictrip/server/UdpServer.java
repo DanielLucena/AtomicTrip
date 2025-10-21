@@ -6,20 +6,22 @@ import java.net.DatagramSocket;
 import java.time.ZonedDateTime;
 import java.util.StringTokenizer;
 
-import dev.danielrl.atomictrip.dto.Message;
 import dev.danielrl.atomictrip.dto.TripDetailsDTO;
 import dev.danielrl.atomictrip.model.Location;
+import dev.danielrl.atomictrip.service.FlightsClientService;
 import dev.danielrl.atomictrip.service.TripService;
 
 public class UdpServer implements Server {
 
 	private TripService tripService;
+	private FlightsClientService flightsClientService;
 	//ExecutorService poolvthreads = Executors.newVirtualThreadPerTaskExecutor();
 
 	@Override
 	public void start(String port) {
 		tripService = new TripService();
-		System.out.println("UDP Server Bank started");
+		flightsClientService = new FlightsClientService(8010);
+		System.out.println("UDP Server Trip started");
 		try {
 			DatagramSocket serversocket = new DatagramSocket(Integer.parseInt(port));
 			while (true) {
@@ -41,7 +43,7 @@ public class UdpServer implements Server {
 		} catch (Exception e) {
 			System.out.println("Erro inesperado: " + e.getMessage());
 		}
-		System.out.println("UDP Bank server terminating");
+		System.out.println("UDP Trip server terminating");
 	}
 
 
@@ -61,9 +63,11 @@ public class UdpServer implements Server {
 				origem = tokenizer.nextToken();
 				destino = tokenizer.nextToken().trim();
 			}
+
+			TripDetailsDTO tripDetails = new TripDetailsDTO(Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta));
 			switch (operacao) {
 				case "bookflight":
-					resultadoOp = new TripDetailsDTO( Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta)).toString();
+					resultadoOp = flightsClientService.bookFlights(tripDetails);
 					break;
 				case "bookhotel":
 					resultadoOp = new TripDetailsDTO( Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(dataIda), ZonedDateTime.parse(dataVolta)).toString();

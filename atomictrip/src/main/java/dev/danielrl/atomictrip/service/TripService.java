@@ -1,5 +1,8 @@
 package dev.danielrl.atomictrip.service;
 
+import java.security.Provider.Service;
+
+import dev.danielrl.atomictrip.dto.ServiceResponse;
 import dev.danielrl.atomictrip.dto.TripDetailsDTO;
 import dev.danielrl.atomictrip.model.Trip;
 import dev.danielrl.atomictrip.repository.TripRepository;
@@ -7,6 +10,8 @@ import dev.danielrl.atomictrip.repository.TripRepository;
 public class TripService {
 
     private TripRepository tripRepository;
+
+    private FlightsClientService flightsClientService = new FlightsClientService(8010);
 
     public TripService() {
         this.tripRepository = new TripRepository();
@@ -17,7 +22,20 @@ public class TripService {
         System.out.println("Booking trip with details: " + tripDetails);
         Trip trip = new Trip(tripDetails.getOrigem(), tripDetails.getDestino(), tripDetails.getDataVolta(), tripDetails.getDataIda());
         saveTrip(trip);
-        String flightcheck = checkFlight(tripDetails);
+        ServiceResponse reservaflight = flightsClientService.reserveFlights(tripDetails);
+        if (reservaflight == ServiceResponse.SUCCESS) {
+            ServiceResponse confirmaflight = flightsClientService.confirmFlights(tripDetails);
+
+
+            if (confirmaflight == ServiceResponse.SUCCESS) {
+                trip.confirmTrip();
+                tripRepository.save(trip);
+            } else {
+                flightsClientService.cancelFlights(tripDetails);
+            }
+        } else {
+            flightsClientService.cancelFlights(tripDetails);
+        }
 
         
     }

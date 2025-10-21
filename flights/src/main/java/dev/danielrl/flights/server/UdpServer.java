@@ -58,7 +58,7 @@ public class UdpServer implements Server {
 				origem = tokenizer.nextToken();
 				destino = tokenizer.nextToken().trim();
 
-				Flight flight = new Flight(Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(data+"T00:00:00Z"));
+				Flight flight = new Flight(Location.valueOf(origem), Location.valueOf(destino), ZonedDateTime.parse(data));
 
 				switch (operacao) {
 					case "reserveflight":
